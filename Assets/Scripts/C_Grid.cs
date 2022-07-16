@@ -8,14 +8,14 @@ public class C_Grid : MonoBehaviour
     public Vector2 gridWorldSize;
 
     public Node[,] grid;
-    public List<Tile> tiles;
+    public List<BaseTile> tiles;
     private int gridSizeX, gridSizeY;
 
     float nodeDiameter;
 
     void Awake()
     {
-        tiles = new List<Tile>();
+        tiles = new List<BaseTile>();
         nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);

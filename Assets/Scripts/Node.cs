@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Node
 {
-    public Tile tile;
-    
+    public BaseTile tile;
+
     public Vector3 worldPosition;
     public int gridX;
     public int gridY;
