@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class Dice : MonoBehaviour
 {
-    private BaseTile activeTile { get; set; }
+    public BaseTile activeTile { get; private set; }
+    public int[] faces { get; private set; }
     private Coroutine activeCoroutine;
-    private Face[] faces = new Face[6];
     private int currentRotation;
     private SpriteRenderer cubeSprite;
     private SpriteRenderer faceSprite;
@@ -18,22 +18,32 @@ public class Dice : MonoBehaviour
 
     private void Start()
     {
+        faces = new int[6];
         SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         cubeSprite = spriteRenderers[0];
         faceSprite = spriteRenderers[1];
         GetComponent<Animator>().SetBool("Dead", false);
 
-        // Initialize starting position
-        activeTile = FindObjectOfType<StartTile>();
-        faces[0].number = 7 - ((StartTile)activeTile).startingNumber;
-        faces[5].number = ((StartTile)activeTile).startingNumber;
-        int offset = 7 - ((StartTile)activeTile).startingNumber;
-        for (int i = 0; i < faces.Length; i++)
+        if (activeTile != null && activeTile.start)
         {
-            faces[i].number = (1 + i) % 6;
-            if (faces[i].number == 0) faces[i].number = 6;
+            // Initialize starting position
+            faces[0] = 7 - activeTile.startingNumber;
+            faces[5] = (7 - faces[0]) % 6;
+            faces[1] = ((7 - activeTile.startingNumber + 2) % 6);
+            faces[4] = (7 - faces[1]) % 6;
+            faces[2] = ((7 - activeTile.startingNumber + 4) % 6);
+            faces[3] = (7 - faces[2]) % 6;
+
+            for (int i = 0; i < faces.Length; i++)
+            {
+                if (faces[i] == 0)
+                {
+                    faces[i] = 6;
+                }
+            }
+
+            RotateDice(activeTile.startingRotations);
         }
-        RotateDice(((StartTile)activeTile).startingRotations);
 
 
         DrawFace();
@@ -70,42 +80,48 @@ public class Dice : MonoBehaviour
         Vector3 targetPosition = transform.position + (inputDirection * FindObjectOfType<C_Grid>().nodeRadius * 2);
         BaseTile newTile = FindObjectOfType<C_Grid>().NodeFromWorldPoint(targetPosition).tile;
 
-        if (newTile != null)
+        float startTime = Time.time;
+
+        // Roll the cube
+        SetCubeRotation(inputDirection);
+        GetComponent<Animator>().SetTrigger("Roll");
+        GetComponent<Animator>().SetFloat("RollSpeed", 1 / moveTime);
+
+        // interpolate between the cube's current and next positions
+        while (transform.position != targetPosition)
         {
-            float startTime = Time.time;
+            float passedTime = Time.time - startTime;
+            float interRatio = passedTime / moveTime;
+            Vector2 newPosition = Vector2.Lerp(startPosition, targetPosition, interRatio);
+            transform.position = newPosition;
 
-            // Roll the cube
-            SetCubeRotation(inputDirection);
-            GetComponent<Animator>().SetTrigger("Roll");
-            GetComponent<Animator>().SetFloat("RollSpeed", 1 / moveTime);
-
-            // interpolate between the cube's current and next positions
-            while (transform.position != targetPosition)
-            {
-                float passedTime = Time.time - startTime;
-                float interRatio = passedTime / moveTime;
-                Vector2 newPosition = Vector2.Lerp(startPosition, targetPosition, interRatio);
-                transform.position = newPosition;
-
-                yield return null;
-            }
-
-            // Set the new faces of the die
-            MoveFaces(inputDirection);
-            DrawFace();
-
-            activeTile = FindObjectOfType<C_Grid>().NodeFromWorldPoint(transform.position).tile;
-
-            if (!CheckTile(activeTile))
-            {
-                Debug.Log("Died");
-                StartCoroutine(DieCoroutine(2));
-                yield break;
-            }
-
-            yield return new WaitForSeconds(moveDelay);
-            activeCoroutine = null;
+            yield return null;
         }
+
+        // Set the new faces of the die
+        MoveFaces(inputDirection);
+        DrawFace();
+
+        activeTile = FindObjectOfType<C_Grid>().NodeFromWorldPoint(transform.position).tile;
+
+        if (!CheckTile(activeTile))
+        {
+            Die();
+            yield break;
+        }
+        else if (activeTile.goal){
+            Win();
+            yield break;
+        }
+
+        yield return new WaitForSeconds(moveDelay);
+        activeCoroutine = null;
+    }
+
+    public void SetActiveTile(BaseTile tile)
+    {
+        activeTile = tile;
+        transform.position = tile.node.worldPosition;
     }
 
     private void SetCubeRotation(Vector2 direction)
@@ -134,52 +150,46 @@ public class Dice : MonoBehaviour
 
     private void DrawFace()
     {
-        faceSprite.sprite = Resources.Load<Sprite>("Sprites/Dice/Face_" + faces[0].number);
+        faceSprite.sprite = Resources.Load<Sprite>("Sprites/Dice/Face_" + faces[0]);
+        int i = ((((faces[1] + faces[2]) % 2) == 1) ? 1 : 0);
+        faceSprite.transform.eulerAngles = new Vector3(0, 0, 90 * i);
     }
 
     private void MoveFaces(Vector2 direction)
     {
-        Face[] facesOld = (Face[])faces.Clone();
+        int[] facesOld = (int[])faces.Clone();
 
         if (direction.x <= -1)
         {
             // Move Left
-            faces[0].number = facesOld[4].number;
-            faces[1].number = facesOld[0].number;
-            faces[2].rotated = !faces[2].rotated;
-            faces[3].rotated = !faces[3].rotated;
-            faces[4].number = facesOld[5].number;
-            faces[5].number = facesOld[1].number;
+            faces[0] = facesOld[4];
+            faces[1] = facesOld[0];
+            faces[4] = facesOld[5];
+            faces[5] = facesOld[1];
         }
         else if (direction.x >= 1)
         {
             // Move Right
-            faces[0].number = facesOld[1].number;
-            faces[1].number = facesOld[5].number;
-            faces[2].rotated = !faces[2].rotated;
-            faces[3].rotated = !faces[3].rotated;
-            faces[4].number = facesOld[0].number;
-            faces[5].number = facesOld[4].number;
+            faces[0] = facesOld[1];
+            faces[1] = facesOld[5];
+            faces[4] = facesOld[0];
+            faces[5] = facesOld[4];
         }
         else if (direction.y >= 1)
         {
             // Move Up
-            faces[0].number = facesOld[2].number;
-            faces[1].rotated = !faces[1].rotated;
-            faces[2].number = facesOld[5].number;
-            faces[3].number = facesOld[0].number;
-            faces[4].rotated = !faces[4].rotated;
-            faces[5].number = facesOld[3].number;
+            faces[0] = facesOld[2];
+            faces[2] = facesOld[5];
+            faces[3] = facesOld[0];
+            faces[5] = facesOld[3];
         }
         else if (direction.y <= -1)
         {
             // Move Down
-            faces[0].number = facesOld[3].number;
-            faces[1].rotated = !faces[1].rotated;
-            faces[2].number = facesOld[0].number;
-            faces[3].number = facesOld[5].number;
-            faces[4].rotated = !faces[4].rotated;
-            faces[5].number = facesOld[2].number;
+            faces[0] = facesOld[3];
+            faces[2] = facesOld[0];
+            faces[3] = facesOld[5];
+            faces[5] = facesOld[2];
         }
     }
 
@@ -199,31 +209,39 @@ public class Dice : MonoBehaviour
 
     private bool CheckTile(BaseTile tile)
     {
+        if (tile == null) return false;
         if (!activeTile.numbered) return true;
-        if (faces[5].number != tile.startingNumber) return false;
+        if (faces[5] != tile.startingNumber) return false;
         return true;
     }
 
     private bool CheckTile(Vector2 direction, BaseTile tile)
     {
+        if (tile == null) return false;
         if (!activeTile.numbered) return true;
-        if (direction.x >= 1 && faces[4].number != tile.startingNumber) return false;
-        else if (direction.x <= -1 && faces[1].number != tile.startingNumber) return false;
-        else if (direction.y >= 1 && faces[3].number != tile.startingNumber) return false;
-        else if (direction.y <= -1 && faces[2].number != tile.startingNumber) return false;
+        if (direction.x >= 1 && faces[4] != tile.startingNumber) return false;
+        else if (direction.x <= -1 && faces[1] != tile.startingNumber) return false;
+        else if (direction.y >= 1 && faces[3] != tile.startingNumber) return false;
+        else if (direction.y <= -1 && faces[2] != tile.startingNumber) return false;
         return true;
     }
 
-    private IEnumerator DieCoroutine(float seconds)
+    private void Die()
     {
-        activeTile.gameObject.SetActive(false);
+        if (activeTile != null)
+        {
+            activeTile.gameObject.SetActive(false);
+        }
+        GetComponent<Animator>().SetFloat("RollSpeed", 1 / (moveTime * 2));
         GetComponent<Animator>().SetBool("Dead", true);
         faceSprite.sprite = null;
 
-        yield return new WaitForSeconds(seconds);
+        StartCoroutine(FindObjectOfType<LevelManager>().ReloadSceneCoroutine());
+    }
 
-        // Reloads the scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    private void Win()
+    {
+        StartCoroutine(FindObjectOfType<LevelManager>().LoadNextLevelCoroutine());
     }
 }
 

@@ -8,7 +8,7 @@ public class C_Grid : MonoBehaviour
     public Vector2 gridWorldSize;
 
     public Node[,] grid;
-    public List<BaseTile> tiles;
+    public List<BaseTile> tiles { get; set; }
     private int gridSizeX, gridSizeY;
 
     float nodeDiameter;

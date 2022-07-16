@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class CameraFollow : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Update() 
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Transform dice = FindObjectOfType<Dice>().transform;
+        transform.position = new Vector3 (dice.position.x, dice.position.y, transform.position.z);
     }
 }
