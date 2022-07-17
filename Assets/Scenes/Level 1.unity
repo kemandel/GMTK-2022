@@ -135,6 +135,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 909819291254810904, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
+      propertyPath: levelText
+      value: A simple path
+      objectReference: {fileID: 0}
     - target: {fileID: 909819291254810982, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
       propertyPath: m_Name
       value: Level Manager
@@ -263,7 +267,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3898677288036582225, guid: cd8ede29cb2857a46b4752af7cfd3168, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3898677288036582225, guid: cd8ede29cb2857a46b4752af7cfd3168, type: 3}
       propertyPath: m_LocalPosition.x
@@ -594,8 +598,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4581169275580068878, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
-      propertyPath: m_Camera
+    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4581169275580068879, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
@@ -608,7 +624,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4581169275580068879, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4581169275580068879, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
       propertyPath: m_AnchorMax.x

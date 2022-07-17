@@ -53,17 +53,20 @@ public class Dice : MonoBehaviour
 
     private void Update()
     {
-        Vector3 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
-        if (activeCoroutine == null)
+        if (!LevelManager.Paused)
         {
-            if (inputDirection.x != 0)
+            Vector3 inputDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+            if (activeCoroutine == null)
             {
-                activeCoroutine = StartCoroutine(MoveCoroutine(inputDirection));
-            }
-            else if (inputDirection.y != 0)
-            {
-                activeCoroutine = StartCoroutine(MoveCoroutine(inputDirection));
+                if (inputDirection.x != 0)
+                {
+                    activeCoroutine = StartCoroutine(MoveCoroutine(inputDirection));
+                }
+                else if (inputDirection.y != 0)
+                {
+                    activeCoroutine = StartCoroutine(MoveCoroutine(inputDirection));
+                }
             }
         }
     }
@@ -102,17 +105,32 @@ public class Dice : MonoBehaviour
         MoveFaces(inputDirection);
         DrawFace();
 
+        if (activeTile.shadow)
+        {
+            activeTile.FadeAway(moveDelay + moveTime);
+        }
+
         activeTile = FindObjectOfType<C_Grid>().NodeFromWorldPoint(transform.position).tile;
+
+        if (activeTile != null && activeTile.quit)
+        {
+            GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Audio/Lose"));
+            FindObjectOfType<LevelManager>().QuitGame();
+            yield break;
+        }
 
         if (!CheckTile(activeTile))
         {
-            Die();
+            Lose();
             yield break;
         }
-        else if (activeTile.goal){
+        
+        if (activeTile.goal){
             Win();
             yield break;
         }
+
+        GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Audio/Note_" + faces[5]));
 
         yield return new WaitForSeconds(moveDelay);
         activeCoroutine = null;
@@ -210,38 +228,30 @@ public class Dice : MonoBehaviour
     private bool CheckTile(BaseTile tile)
     {
         if (tile == null) return false;
-        if (!activeTile.numbered) return true;
-        if (faces[5] != tile.startingNumber) return false;
+        if (!tile.active) return false;
+        if (activeTile.numbered && faces[5] != tile.startingNumber) return false;
         return true;
     }
 
-    private bool CheckTile(Vector2 direction, BaseTile tile)
-    {
-        if (tile == null) return false;
-        if (!activeTile.numbered) return true;
-        if (direction.x >= 1 && faces[4] != tile.startingNumber) return false;
-        else if (direction.x <= -1 && faces[1] != tile.startingNumber) return false;
-        else if (direction.y >= 1 && faces[3] != tile.startingNumber) return false;
-        else if (direction.y <= -1 && faces[2] != tile.startingNumber) return false;
-        return true;
-    }
-
-    private void Die()
+    private void Lose()
     {
         if (activeTile != null)
         {
-            activeTile.gameObject.SetActive(false);
+            if (activeTile.isActiveAndEnabled) activeTile.FadeAway(.5f);
         }
         GetComponent<Animator>().SetFloat("RollSpeed", 1 / (moveTime * 2));
         GetComponent<Animator>().SetBool("Dead", true);
         faceSprite.sprite = null;
 
-        StartCoroutine(FindObjectOfType<LevelManager>().ReloadSceneCoroutine());
+        GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Audio/Lose"));
+
+        FindObjectOfType<LevelManager>().ReloadScene();
     }
 
     private void Win()
     {
-        StartCoroutine(FindObjectOfType<LevelManager>().LoadNextLevelCoroutine());
+        GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Audio/Win"));
+        FindObjectOfType<LevelManager>().LoadNextLevel();
     }
 }
 
