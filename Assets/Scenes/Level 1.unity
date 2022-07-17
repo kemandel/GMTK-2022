@@ -137,7 +137,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 909819291254810904, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
       propertyPath: levelText
-      value: A simple path
+      value: Trivial Pathing
       objectReference: {fileID: 0}
     - target: {fileID: 909819291254810982, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
       propertyPath: m_Name
@@ -598,22 +598,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
-      propertyPath: m_Color.b
-      value: 1
+    - target: {fileID: 4581169275580068877, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_ScreenMatchMode
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 147889570, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
-      propertyPath: m_Material
+    - target: {fileID: 4581169275580068878, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
+      propertyPath: m_Camera
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1128821369}
     - target: {fileID: 4581169275580068879, guid: 7893f6e7c6c523a42a293a524404838a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -711,6 +703,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3894057467266651445, guid: 860db423c51b41f4e95f145a0dd2d03d, type: 3}
+      propertyPath: orthographic size
+      value: 5.625
+      objectReference: {fileID: 0}
     - target: {fileID: 3894057467266651446, guid: 860db423c51b41f4e95f145a0dd2d03d, type: 3}
       propertyPath: m_Name
       value: Main Camera
@@ -761,6 +757,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 860db423c51b41f4e95f145a0dd2d03d, type: 3}
+--- !u!20 &1128821369 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 3894057467266651445, guid: 860db423c51b41f4e95f145a0dd2d03d, type: 3}
+  m_PrefabInstance: {fileID: 1128821368}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1169637669
 PrefabInstance:
   m_ObjectHideFlags: 0

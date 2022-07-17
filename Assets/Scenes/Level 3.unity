@@ -1079,7 +1079,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 909819291254810904, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
       propertyPath: levelText
-      value: loops on loops on loops
+      value: Simple Pathing
       objectReference: {fileID: 0}
     - target: {fileID: 909819291254810982, guid: 4f47b59614cfdb24a8a3fde735a3d0e3, type: 3}
       propertyPath: m_Name
